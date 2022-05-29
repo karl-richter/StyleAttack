@@ -67,6 +67,7 @@ def predict_labels(data):
     prediction = (
         model(embeddings.cuda() if torch.cuda.is_available() else embeddings.cpu())
         .logits.detach()
+        .cpu()
         .numpy()
     )
     scores = (np.exp(prediction).T / np.exp(prediction).sum(-1)).T
