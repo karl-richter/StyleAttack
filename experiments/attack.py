@@ -150,5 +150,5 @@ def main(params: dict):
     orig_shap_values = explainer(x_test, fixed_context=1).values
     adv_shap_values = explainer(adv_x_test, fixed_context=1).values
 
-    np.save("/content/orig_shapvals.npy", orig_shap_values)
-    np.save("/content/adv_shapvals.npy", adv_shap_values)
+    np.save("/content/drive/MyDrive/NLP-Lab/SHAP/orig_shapvals.npy", orig_shap_values)
+    np.save("/content/drive/MyDrive/NLP-Lab/SHAPadv_shapvals.npy", adv_shap_values)
