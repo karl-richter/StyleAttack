@@ -147,8 +147,8 @@ def main(params: dict):
     explainer = shap.Explainer(predict_labels, tokenizer)
 
     # calculate the SHAP values
-    orig_shap_values = explainer(x_test, fixed_context=1)
-    adv_shap_values = explainer(adv_x_test, fixed_context=1)
+    orig_shap_values = explainer(x_test, fixed_context=1).values
+    adv_shap_values = explainer(adv_x_test, fixed_context=1).values
 
     np.save("/content/orig_shapvals.npy", np.array(orig_shap_values, dtype=object))
     np.save("/content/adv_shapvals.npy", np.array(adv_shap_values, dtype=object))
