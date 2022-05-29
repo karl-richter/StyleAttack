@@ -22,7 +22,7 @@ type = params.bert_type
 
 def load_model():
     model = AutoModelForSequenceClassification.from_pretrained(params.model_name)
-    model.gpu() if torch.cuda.is_available() else model.cpu()
+    model.cuda() if torch.cuda.is_available() else model.cpu()
     model.eval()
     return model
 
@@ -44,7 +44,7 @@ def write_data(attack_data):
 def get_predict_label(model, sent):
     inputs = tokenizer(sent, return_tensors="pt", padding=True)
     output = model(
-        inputs["input_ids"].gpu()
+        inputs["input_ids"].cuda()
         if torch.cuda.is_available()
         else inputs["input_ids"].cpu()
     )[
