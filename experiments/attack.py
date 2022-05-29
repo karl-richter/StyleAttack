@@ -139,8 +139,8 @@ def main(params: dict):
     # transform the attack data to be used for SHAP
     adv_x_test, adv_y_test = transform_attack_data(attack_data)
     x_test, y_test = (
-        np.array(orig_data)[:, 0].tolist(),
-        np.array(orig_data)[:, 1].tolist(),
+        np.array(orig_data)[:, 0][: adv_x_test.size].tolist(),
+        np.array(orig_data)[:, 1][: adv_x_test.size].tolist(),
     )
 
     # initialise the SHAP explainer
@@ -150,5 +150,5 @@ def main(params: dict):
     orig_shap_values = explainer(x_test, fixed_context=1).values
     adv_shap_values = explainer(adv_x_test, fixed_context=1).values
 
-    np.save("/content/orig_shapvals.npy", np.array(orig_shap_values, dtype=object))
-    np.save("/content/adv_shapvals.npy", np.array(adv_shap_values, dtype=object))
+    np.save("/content/orig_shapvals.npy", orig_shap_values)
+    np.save("/content/adv_shapvals.npy", adv_shap_values)
