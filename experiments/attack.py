@@ -77,7 +77,7 @@ def predict_labels(data):
 
 def transform_attack_data(adv_examples):
     # Filter out skipped and unsuccessful attacks
-    adv_examples = adv_examples[adv_examples["result_type"] == "Successful"]
+    adv_examples = adv_examples[adv_examples["result_type"] == "Failed"]  # Successful
 
     adv_x_test = np.array(adv_examples["perturbed_text"])
     adv_y_test = np.array(adv_examples["original_output"])
