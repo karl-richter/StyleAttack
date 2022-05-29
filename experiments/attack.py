@@ -77,7 +77,9 @@ def predict_labels(data):
 
 def transform_attack_data(adv_examples):
     # Filter out skipped and unsuccessful attacks
-    adv_examples = adv_examples[adv_examples["result_type"] == "Failed"]  # Successful
+    adv_examples = adv_examples[
+        adv_examples["result_type"] == "Successful"
+    ]  # Successful
 
     adv_x_test = np.array(adv_examples["perturbed_text"])
     adv_y_test = np.array(adv_examples["original_output"])
@@ -139,8 +141,8 @@ def main(params: dict):
     # transform the attack data to be used for SHAP
     adv_x_test, adv_y_test = transform_attack_data(attack_data)
     x_test, y_test = (
-        np.array(orig_data)[:, 0][: adv_x_test.size].tolist(),
-        np.array(orig_data)[:, 1][: adv_x_test.size].tolist(),
+        np.array(orig_data)[:, 0].tolist(),  # [: adv_x_test.size]
+        np.array(orig_data)[:, 1].tolist(),
     )
 
     # initialise the SHAP explainer
