@@ -1,3 +1,3 @@
-result_type	original_text	pertubed_text	original_output	pertubed_output
+result_type	original_text	perturbed_text	original_output	perturbed_output
 Failed	no movement , no yuks , not much of anything .	no movement , no yuks , not much of anything .	0	0
 Successful	a gob of drivel so sickly sweet , even the eager consumers of moore 's pasteurized ditties will retch it up like rancid crème brûlée .	a liqueur so sweet and moist, even the eager consumers of the horse's cured ditties will sneeze like rancid cream.	0	1

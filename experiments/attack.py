@@ -1,6 +1,6 @@
 import logging
-
-# import numpy as np
+import numpy as np
+import pandas as pd
 import shap
 import torch
 from style_paraphrase.inference_utils import GPT2Generator
@@ -75,23 +75,9 @@ def predict_labels(data):
     return val
 
 
-def transform_attack_data(attack_data):
-    import numpy as np
-    import pandas as pd
-
-    adv_examples = pd.DataFrame(
-        attack_data,
-        columns=[
-            "result_type",
-            "original_text",
-            "perturbed_text",
-            "original_output",
-            "perturbed_output",
-        ],
-    )
-
+def transform_attack_data(adv_examples):
     # Filter out skipped and unsuccessful attacks
-    adv_examples = adv_examples[adv_examples["result_type"] == "Failed"]
+    adv_examples = adv_examples[adv_examples["result_type"] == "Successful"]
 
     adv_x_test = np.array(adv_examples["perturbed_text"])
     adv_y_test = np.array(adv_examples["original_output"])
@@ -148,12 +134,21 @@ def main(params: dict):
 
     # checkpoint the attack data
     write_data(attack_data=attack_data, output_file_path=params.output_file_path)
+    attack_data = pd.read_table(params.output_file_path)
 
     # transform the attack data to be used for SHAP
     adv_x_test, adv_y_test = transform_attack_data(attack_data)
+    x_test, y_test = (
+        np.array(orig_data)[:, 0].tolist(),
+        np.array(orig_data)[:, 1].tolist(),
+    )
 
     # initialise the SHAP explainer
     explainer = shap.Explainer(predict_labels, tokenizer)
 
     # calculate the SHAP values
-    shap_values = explainer(adv_x_test, fixed_context=1)
+    orig_shap_values = explainer(x_test, fixed_context=1)
+    adv_shap_values = explainer(adv_x_test, fixed_context=1)
+
+    np.save("/content/orig_shapvals.npy", orig_shap_values)
+    np.save("/content/adv_shapvals.npy", adv_shap_values)
