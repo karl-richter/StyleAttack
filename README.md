@@ -1,7 +1,9 @@
 # StyleAttack
 Code and data of the EMNLP 2021 paper "**Mind the Style of Text! Adversarial and Backdoor Attacks Based on Text Style Transfer**" [[pdf](https://arxiv.org/abs/2110.07139)]
 
-
+```bash
+CUDA_VISIBLE_DEVICES="" python attack.py --model_name  textattack/bert-base-uncased-SST-2 --orig_file_path ../data/clean/sst-2/tiny.tsv --model_dir ../data/models/paraphraser_gpt2_large --output_file_path ..data/record.tsv
+```
 
 ## Prepare Data
 
