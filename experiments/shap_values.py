@@ -67,7 +67,7 @@ def pad_embeddings(shap_values, max_tokens: int = 200):
 
 def main(params: dict):
     tokenizer = AutoTokenizer.from_pretrained(params.bert_type)
-    attack_data = pd.read_table(params.attack_file_path).head(params.num_sentences)
+    attack_data = pd.read_table(params.attack_file_path).head(int(params.num_sentences))
 
     # transform the attack data to be used for SHAP
     orig_x_test, _, adv_x_test, _ = transform_attack_data(attack_data)
