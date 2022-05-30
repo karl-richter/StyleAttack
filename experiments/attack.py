@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import shap
 import torch
+from sklearn.utils import shuffle
 from style_paraphrase.inference_utils import GPT2Generator
 from tqdm import tqdm
 from transformers import AutoTokenizer
@@ -20,8 +21,6 @@ def load_model(model_name: str):
 
 
 def read_data(file_path):
-    import pandas as pd
-
     data = pd.read_table(file_path).values.tolist()
     return data
 
@@ -52,44 +51,6 @@ def get_predict_label(model, sent, tokenizer):
     ].squeeze()  # attention_masks=inputs["attention_mask"].cpu()
     predict = torch.argmax(output).item()
     return predict
-
-
-def predict_labels(data):
-    import numpy as np
-    import math
-
-    model = load_model(model_name="textattack/bert-base-uncased-SST-2")
-    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-
-    # Tokenize inputs
-    embeddings = tokenizer(list(data), return_tensors="pt", padding=True).input_ids
-    # Predict
-    prediction = (
-        model(embeddings.cuda() if torch.cuda.is_available() else embeddings.cpu())
-        .logits.detach()
-        .cpu()
-        .numpy()
-    )
-    scores = (np.exp(prediction).T / np.exp(prediction).sum(-1)).T
-    val = [1 / (1 + math.exp(-x)) for x in scores[:, 1]]
-    return val
-
-
-def transform_attack_data(adv_examples):
-    # Filter out skipped and unsuccessful attacks
-    adv_examples = adv_examples[
-        adv_examples["result_type"] == "Successful"
-    ]  # Successful
-
-    adv_x_test = np.array(adv_examples["perturbed_text"])
-    adv_y_test = np.array(adv_examples["original_output"])
-
-    # adv_x_test = tokenizer(
-    #    list(adv_x_test), return_tensors="pt", padding=True
-    # ).input_ids
-
-    # adv_y_test = list(adv_y_test)
-    return adv_x_test, adv_y_test
 
 
 def main(params: dict):
@@ -136,21 +97,33 @@ def main(params: dict):
 
     # checkpoint the attack data
     write_data(attack_data=attack_data, output_file_path=params.output_file_path)
+    """
     attack_data = pd.read_table(params.output_file_path)
 
     # transform the attack data to be used for SHAP
-    adv_x_test, adv_y_test = transform_attack_data(attack_data)
-    x_test, y_test = (
-        np.array(orig_data)[:, 0].tolist(),  # [: adv_x_test.size]
-        np.array(orig_data)[:, 1].tolist(),
+    orig_x_test, orig_y_test, adv_x_test, adv_y_test = transform_attack_data(
+        attack_data
     )
 
     # initialise the SHAP explainer
     explainer = shap.Explainer(predict_labels, tokenizer)
 
     # calculate the SHAP values
-    orig_shap_values = explainer(x_test, fixed_context=1).values
-    adv_shap_values = explainer(adv_x_test, fixed_context=1).values
+    orig_shap_values = explainer(orig_x_test, fixed_context=1)
+    adv_shap_values = explainer(adv_x_test, fixed_context=1)
 
-    np.save("/content/drive/MyDrive/NLP-Lab/SHAP/orig_shapvals.npy", orig_shap_values)
-    np.save("/content/drive/MyDrive/NLP-Lab/SHAPadv_shapvals.npy", adv_shap_values)
+    orig_shap_padded = pad_embeddings(orig_shap_values)
+    adv_shap_padded = pad_embeddings(adv_shap_values)
+
+    shap_padded = np.concatenate((orig_shap_padded, adv_shap_padded))
+
+    orig_labels = np.zeros(orig_shap_padded.shape[0])
+    adv_labels = np.ones(adv_shap_padded.shape[0])
+
+    labels = np.concatenate((orig_labels, adv_labels))
+
+    X, Y = shuffle(shap_padded, labels, random_state=42)
+
+    np.save("/content/drive/MyDrive/NLP-Lab/SHAP/shap_vals.npy", X)
+    np.save("/content/drive/MyDrive/NLP-Lab/SHAP/shap_labels.npy", Y)
+    """

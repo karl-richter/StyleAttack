@@ -1,8 +1,6 @@
 import pytest
 import logging
 
-from attack import main
-
 logger = logging.getLogger("cddm")
 
 
@@ -28,5 +26,19 @@ def test_style_attack():
         "bert_type": "bert-base-uncased",
         "output_nums": 2,
     }
+    from attack import main
+
+    main(params=dotdict(params))
+
+
+def test_shap():
+    params = {
+        "model_name": "textattack/bert-base-uncased-SST-2",
+        "attack_file_path": "./data/style_attack.tsv",
+        "output_file_path": "./data/shap/",
+        "num_sentences": 2,
+        "bert_type": "bert-base-uncased",
+    }
+    from shap_values import main
 
     main(params=dotdict(params))
