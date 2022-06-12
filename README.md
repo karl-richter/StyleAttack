@@ -2,8 +2,7 @@
 
 > **_NOTE:_** Original code and data of the EMNLP 2021 paper "**Mind the Style of Text! Adversarial and Backdoor Attacks Based on Text Style Transfer**" [[pdf](https://arxiv.org/abs/2110.07139)]
 
----
-This repository extends the original attack repo with an adversarial detector trained on SHAP values.
+This repository extends the original attack repo with an adversarial detector trained on SHAP values.  
 The aim is to benchmark the capabilities of the detector to discriminate between adversarial and original samples.
 
 ### Style Attack
